@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Witcher's Field Journal",
+  "description": "Интерактивный бестиарий и дневник Геральта из Ривии с возможностью общения через Gemini API.",
+  "requestFramePermissions": []
+}
