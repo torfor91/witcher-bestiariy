@@ -52,7 +52,7 @@ export const CREATURES: Creature[] = [
     className: 'Реликты',
     description: 'Гора мышц и ярости. Третий глаз беса способен гипнотизировать противника, погружая его в кошмар. Обитает в самых густых чащах, где нога человека ступает редко.',
     weaknesses: ['Бомба Самум', 'Масло против реликтов', 'Чертов гриб'],
-    imageUrl: '/images/bes.png',
+    imageUrl: 'https://drive.google.com/file/d/1EhS2q8rk_xOcHZLHawhMg22rrQZI_Oi0/view?usp=drive_link',
     threatLevel: 5
   },
   {
@@ -61,7 +61,7 @@ export const CREATURES: Creature[] = [
     className: 'Вампиры',
     description: 'Высший вампир, но не из тех, с кем можно договориться. Обладает интеллектом, но использует его лишь для охоты. Любит блестящие предметы и человеческую кровь, часто прячется в городе.',
     weaknesses: ['Масло против вампиров', 'Луная пыль', 'Знак Ирден', 'Знак Игни'],
-    imageUrl: '/images/catakan.png',
+    imageUrl: 'https://drive.google.com/file/d/1A1wMe8elf2ukoUeGaSsZCWj5ylI40XJO/view?usp=drive_link',
     threatLevel: 5
   },
   {
@@ -88,7 +88,7 @@ export const CREATURES: Creature[] = [
     className: 'Вампиры',
     description: 'Вампир, что не боится солнца. Выглядит как прекрасная дева, но внутри — кровожадное чудовище. Её крик может оглушить или даже убить. Передвигается быстрее, чем уследит глаз.',
     weaknesses: ['Масло против вампиров', 'Лунная пыль', 'Знак Ирден', 'Знак Аард'],
-    imageUrl: '/images/bruksa.png',
+    imageUrl: 'https://drive.google.com/file/d/1Xq1-CibACGeIcwyRTcQIbwicRUC-LNoh/view?usp=drive_link',
     threatLevel: 5
   },
   {
