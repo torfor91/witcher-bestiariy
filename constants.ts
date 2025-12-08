@@ -7,8 +7,7 @@ export const CREATURES: Creature[] = [
     className: 'Трупоеды',
     description: 'Гули — существа, которые не знают ни чести, ни жалости. Они пожирают трупы, но не брезгуют и живыми, если те достаточно глупы, чтобы забрести на кладбище ночью. Их когти остры, как бритвы, а яд парализует.',
     weaknesses: ['Масло против трупоедов', 'Знак Игни'],
-    // Используем официальный рендер, соответствующий прикрепленному фото
-    imageUrl: 'https://static.wikia.nocookie.net/witcher/images/6/66/Tw3_journal_ghoul.png',
+    imageUrl: 'images/ghoul.png',
     threatLevel: 2
   },
   {
@@ -17,7 +16,7 @@ export const CREATURES: Creature[] = [
     className: 'Реликты',
     description: 'Леший — это сама суть леса. Древний, могущественный и беспощадный к тем, кто не уважает природу. Он повелевает волками и воронами, может растворяться в дыму и призывать корни из-под земли.',
     weaknesses: ['Двимеритовая бомба', 'Масло против реликтов', 'Знак Игни'],
-    imageUrl: 'https://picsum.photos/400/300?random=2',
+    imageUrl: 'images/leshiy.png',
     threatLevel: 5
   },
   {
@@ -26,7 +25,7 @@ export const CREATURES: Creature[] = [
     className: 'Трупоеды',
     description: 'Утопцами становятся негодяи, закончившие свою жизнь в воде. Глупые, но опасные в стае, особенно если рядом есть водная баба. Обитают у берегов рек и болот.',
     weaknesses: ['Масло против трупоедов', 'Знак Игни'],
-    imageUrl: 'https://picsum.photos/400/300?random=3',
+    imageUrl: 'images/utonyl.png',
     threatLevel: 1
   },
   {
@@ -35,7 +34,7 @@ export const CREATURES: Creature[] = [
     className: 'Гибриды',
     description: 'Благородное, но смертоносное создание. Смесь льва и орла. Атакует с воздуха, пикируя на жертву. Ненавидит, когда трогают его территорию или партнера. Очень опасен в брачный период.',
     weaknesses: ['Картечь', 'Масло против гибридов', 'Знак Аард'],
-    imageUrl: 'https://picsum.photos/400/300?random=4',
+    imageUrl: 'images/grifon.png',
     threatLevel: 3
   },
   {
@@ -44,7 +43,7 @@ export const CREATURES: Creature[] = [
     className: 'Призраки',
     description: 'Рождаются из боли и смерти молодых женщин перед свадьбой. Появляются в полдень, сводя путников с ума и высасывая жизнь. Нематериальны, пока не попадут в ловушку.',
     weaknesses: ['Луная пыль', 'Масло против призраков', 'Знак Ирден'],
-    imageUrl: 'https://picsum.photos/400/300?random=5',
+    imageUrl: 'images/poludennica.png',
     threatLevel: 4
   },
   {
@@ -53,7 +52,7 @@ export const CREATURES: Creature[] = [
     className: 'Реликты',
     description: 'Гора мышц и ярости. Третий глаз беса способен гипнотизировать противника, погружая его в кошмар. Обитает в самых густых чащах, где нога человека ступает редко.',
     weaknesses: ['Бомба Самум', 'Масло против реликтов', 'Чертов гриб'],
-    imageUrl: 'https://picsum.photos/400/300?random=6',
+    imageUrl: 'images/bes.png',
     threatLevel: 5
   },
   {
@@ -62,7 +61,7 @@ export const CREATURES: Creature[] = [
     className: 'Вампиры',
     description: 'Высший вампир, но не из тех, с кем можно договориться. Обладает интеллектом, но использует его лишь для охоты. Любит блестящие предметы и человеческую кровь, часто прячется в городе.',
     weaknesses: ['Масло против вампиров', 'Луная пыль', 'Знак Ирден', 'Знак Игни'],
-    imageUrl: 'https://picsum.photos/400/300?random=7',
+    imageUrl: 'images/catakan.png',
     threatLevel: 5
   },
   {
@@ -71,7 +70,7 @@ export const CREATURES: Creature[] = [
     className: 'Проклятые',
     description: 'Человек, превращенный в зверя проклятием. Чрезвычайно быстр и способен регенерировать раны прямо на глазах. Серебро жжет его плоть, но без бомбы регенерацию не остановить.',
     weaknesses: ['Масло против проклятых', 'Луная пыль', 'Знак Игни', 'Чертов гриб'],
-    imageUrl: 'https://picsum.photos/400/300?random=8',
+    imageUrl: 'images/volkolak.png',
     threatLevel: 3
   },
   {
@@ -80,7 +79,7 @@ export const CREATURES: Creature[] = [
     className: 'Огры',
     description: 'Владыка Скеллигских гор. Огромный, закованный в ледяную броню, способный раздавить человека одним ударом. Строит себе "доспехи" из обломков кораблей.',
     weaknesses: ['Масло против огров', 'Знак Квен', 'Знак Игни'],
-    imageUrl: 'https://picsum.photos/400/300?random=9',
+    imageUrl: 'images/velikan_led.png',
     threatLevel: 5
   },
   {
@@ -89,7 +88,7 @@ export const CREATURES: Creature[] = [
     className: 'Вампиры',
     description: 'Вампир, что не боится солнца. Выглядит как прекрасная дева, но внутри — кровожадное чудовище. Её крик может оглушить или даже убить. Передвигается быстрее, чем уследит глаз.',
     weaknesses: ['Масло против вампиров', 'Лунная пыль', 'Знак Ирден', 'Знак Аард'],
-    imageUrl: 'https://picsum.photos/400/300?random=10',
+    imageUrl: 'images/bruksa.png',
     threatLevel: 5
   },
   {
@@ -98,7 +97,7 @@ export const CREATURES: Creature[] = [
     className: 'Трупоеды',
     description: 'В густом тумане они — короли. Могут создавать иллюзии и становиться невидимыми. Если видишь, что туман сгущается неестественно быстро — доставай меч.',
     weaknesses: ['Масло против трупоедов', 'Знак Квен', 'Луная пыль'],
-    imageUrl: 'https://picsum.photos/400/300?random=11',
+    imageUrl: 'images/tumannik.png',
     threatLevel: 3
   },
   {
@@ -107,7 +106,7 @@ export const CREATURES: Creature[] = [
     className: 'Реликты',
     description: 'Меньший собрат беса, но куда более агрессивный. Не обладает гипнозом, зато берет грубой силой и скоростью. Если разорить его гнездо, будет преследовать до конца света.',
     weaknesses: ['Масло против реликтов', 'Чертов гриб'],
-    imageUrl: 'https://picsum.photos/400/300?random=12',
+    imageUrl: 'images/chert.png',
     threatLevel: 4
   },
   {
@@ -116,7 +115,7 @@ export const CREATURES: Creature[] = [
     className: 'Дракониды',
     description: 'Часто путают с драконами, что их сильно злит. У виверны две лапы, а не четыре. Ядовитый хвост и острые зубы. Хватает овец, а иногда и пастухов.',
     weaknesses: ['Масло против драконидов', 'Знак Аард', 'Иволга'],
-    imageUrl: 'https://picsum.photos/400/300?random=13',
+    imageUrl: 'images/viverna.png',
     threatLevel: 3
   },
   {
@@ -125,7 +124,7 @@ export const CREATURES: Creature[] = [
     className: 'Проклятые',
     description: 'Мерзкое создание, рождающееся из мертвого нежеланного младенца, которого не похоронили должным образом. Питается силой и кровью беременных женщин. Можно расколдовать в Чура.',
     weaknesses: ['Масло против проклятых', 'Знак Аксий'],
-    imageUrl: 'https://picsum.photos/400/300?random=14',
+    imageUrl: 'images/igosha.png',
     threatLevel: 4
   },
   {
@@ -134,7 +133,7 @@ export const CREATURES: Creature[] = [
     className: 'Дракониды',
     description: 'Говорят, его взгляд обращает в камень. Чушь. Но его яд и когти убьют тебя быстрее, чем ты проверишь эту легенду. Любит темные пещеры и подвалы.',
     weaknesses: ['Масло против драконидов', 'Знак Игни', 'Бомба Танцующая Звезда'],
-    imageUrl: 'https://picsum.photos/400/300?random=15',
+    imageUrl: 'images/vasilisk.png',
     threatLevel: 3
   },
   {
@@ -143,7 +142,7 @@ export const CREATURES: Creature[] = [
     className: 'Трупоеды',
     description: 'Старая карга, живущая в болотах. Швыряется комьями грязи, ослепляя противника, а затем разрывает его когтями. Часто командует стаей утопцев.',
     weaknesses: ['Масло против трупоедов', 'Знак Игни', 'Знак Квен'],
-    imageUrl: 'https://picsum.photos/400/300?random=16',
+    imageUrl: 'images/vodnaya_baba.png',
     threatLevel: 3
   },
   {
@@ -152,7 +151,7 @@ export const CREATURES: Creature[] = [
     className: 'Огры',
     description: 'Одноглазый великан. Умом не блещет, но сила удара такова, что ломает кости даже через блок. Глаз — его единственное уязвимое место, если удастся попасть.',
     weaknesses: ['Масло против огров', 'Знак Аксий', 'Знак Квен'],
-    imageUrl: 'https://picsum.photos/400/300?random=17',
+    imageUrl: 'images/ciclop.png',
     threatLevel: 4
   },
   {
@@ -161,7 +160,7 @@ export const CREATURES: Creature[] = [
     className: 'Призраки',
     description: 'Редкий демон, паразитирующий на чувстве вины. Он не убивает жертву сразу, а сводит её с ума годами. Его почти невозможно увидеть, только тень на стене выдает его.',
     weaknesses: ['Знак Игни', 'Изгнание через обман'],
-    imageUrl: 'https://picsum.photos/400/300?random=18',
+    imageUrl: 'images/him.png',
     threatLevel: 5
   }
 ];
