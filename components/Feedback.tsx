@@ -33,18 +33,24 @@ export const Feedback: React.FC = () => {
     setError(null);
     
     try {
-      // Создаем FormData объект как для обычной HTML формы
+      // ДЕБАГ: Логируем данные
+      console.log('📤 Отправляемые данные:', formData);
+      
+      // Создаем FormData
       const formDataToSend = new FormData();
-      formDataToSend.append('email', formData.email);
+      formDataToSend.append('email', formData.email || 'no-email@example.com');
       formDataToSend.append('message', formData.message);
-      formDataToSend.append('name', formData.name);
+      formDataToSend.append('name', formData.name || 'Аноним');
       formDataToSend.append('category', formData.category);
       formDataToSend.append('_subject', `[Ведьмак] ${getCategoryName(formData.category)} от ${formData.name || 'Аноним'}`);
-      formDataToSend.append('_format', 'plain');
-      formDataToSend.append('_language', 'ru');
-      formDataToSend.append('_replyto', formData.email);
       
-      // Отправляем на Formspree с вашим Form ID
+      // ДЕБАГ: Проверяем FormData
+      console.log('📦 FormData entries:');
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+      
+      // Отправляем на Formspree
       const response = await fetch('https://formspree.io/f/mvgebapo', {
         method: 'POST',
         body: formDataToSend,
@@ -53,24 +59,33 @@ export const Feedback: React.FC = () => {
         }
       });
       
-      if (response.ok) {
-        // Успешная отправка
-        console.log('✅ Форма успешно отправлена на Formspree');
-        setIsSubmitted(true);
-        setFormData({ name: '', email: '', message: '', category: 'bug' });
+      console.log('📨 Response status:', response.status);
+      console.log('📨 Response headers:', response.headers);
+      
+      const responseText = await response.text();
+      console.log('📨 Response text:', responseText);
+      
+      try {
+        const responseData = JSON.parse(responseText);
+        console.log('📨 Response JSON:', responseData);
         
-        // Автоматически скрыть сообщение об успехе через 5 секунд
-        setTimeout(() => setIsSubmitted(false), 5000);
-      } else {
-        // Ошибка Formspree
-        const errorData = await response.json();
-        console.error('❌ Formspree error:', errorData);
-        setError('Ошибка отправки. Попробуйте еще раз.');
+        if (response.ok) {
+          console.log('✅ УСПЕХ: Форма отправлена на Formspree');
+          setIsSubmitted(true);
+          setFormData({ name: '', email: '', message: '', category: 'bug' });
+          
+          setTimeout(() => setIsSubmitted(false), 5000);
+        } else {
+          console.error('❌ ОШИБКА Formspree:', responseData);
+          setError(`Ошибка Formspree: ${responseData.error || 'Неизвестная ошибка'}`);
+        }
+      } catch (jsonError) {
+        console.error('❌ ОШИБКА парсинга JSON:', jsonError, 'Raw:', responseText);
+        setError('Неверный ответ от сервера');
       }
-    } catch (error) {
-      // Сетевая ошибка
-      console.error('❌ Network error:', error);
-      setError('Проблема с сетью. Проверьте подключение.');
+    } catch (error: any) {
+      console.error('❌ СЕТЕВАЯ ОШИБКА:', error);
+      setError(`Сетевая ошибка: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -86,6 +101,12 @@ export const Feedback: React.FC = () => {
     }
   };
 
+  const handleTestEmail = () => {
+    console.log('🧪 Тестовый email:', formData.email);
+    console.log('🧪 Сообщение:', formData.message);
+    alert(`Тестовый email: ${formData.email}\nСообщение: ${formData.message}`);
+  };
+
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto animate-fade-in">
       <h2 className="text-4xl md:text-5xl font-headers text-[#e6d5ac] text-center mb-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] border-b-2 border-[#8d6e63] pb-4 inline-block w-full">
@@ -99,169 +120,140 @@ export const Feedback: React.FC = () => {
 
         {isSubmitted ? (
           <div className="text-center py-12 animate-fade-in">
-            <div className="text-6xl mb-4 animate-bounce">✅</div>
+            <div className="text-6xl mb-4">✅</div>
             <h3 className="text-3xl font-headers text-[#5d4037] mb-4">Сова доставлена!</h3>
             <p className="text-xl font-handwritten text-[#8d6e63] mb-2">
-              Твоё послание успешно отправлено через Formspree.
+              Послание отправлено через Formspree.
             </p>
-            <p className="text-lg font-serif text-[#8d6e63] opacity-80">
-              Я получу его и отвечу если оставил совиный адрес.
+            <p className="text-lg font-serif text-[#8d6e63] opacity-80 mb-6">
+              Проверь консоль браузера для деталей.
             </p>
             <button
               onClick={() => setIsSubmitted(false)}
-              className="mt-6 px-6 py-2 bg-[#5d4037] text-[#f3e5ab] font-headers rounded hover:bg-[#8d6e63] transition-colors"
+              className="px-6 py-2 bg-[#5d4037] text-[#f3e5ab] font-headers rounded hover:bg-[#8d6e63] transition-colors"
             >
-              Отправить еще одно послание
+              Отправить ещё
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-4 bg-[#ffebee] border-l-4 border-[#c62828] text-[#c62828] rounded">
-                <div className="font-headers flex items-center gap-2">
-                  <span>⚠️</span>
-                  <span>{error}</span>
+          <>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
+                  <div className="font-headers flex items-center gap-2">
+                    <span>⚠️</span>
+                    <span>{error}</span>
+                  </div>
                 </div>
-              </div>
-            )}
-            
-            <div className="space-y-2">
-              <label className="block font-headers text-xl text-[#5d4037]">
-                <span className="border-b-2 border-[#8d6e63] pb-1">Твоё имя</span>
-                <span className="text-lg text-[#8d6e63] ml-2">(необязательно)</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Геральт, Цири, Йеннифер..."
-                className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-handwritten text-xl text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors placeholder-[#a1887f]"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block font-headers text-xl text-[#5d4037]">
-                <span className="border-b-2 border-[#8d6e63] pb-1">Твоя сова (email)</span>
-                <span className="text-lg text-[#8d6e63] ml-2">(необязательно, но для ответа нужно)</span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="geralt@rivia.witcher"
-                className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-handwritten text-xl text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors placeholder-[#a1887f]"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block font-headers text-xl text-[#5d4037]">
-                <span className="border-b-2 border-[#8d6e63] pb-1">Тип послания</span>
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-headers text-lg text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors appearance-none cursor-pointer"
-              >
-                <option value="bug">📜 Нашёл баг/ошибку</option>
-                <option value="suggestion">💡 Есть идея для улучшения</option>
-                <option value="creature">🐺 Хочу новое существо в бестиарий</option>
-                <option value="other">⚔️ Прочее</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block font-headers text-xl text-[#5d4037]">
-                <span className="border-b-2 border-[#8d6e63] pb-1">Текст послания *</span>
-              </label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                required
-                rows={6}
-                placeholder="Опиши что случилось, что предложить или просто поболтай о ведьмаках..."
-                className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-handwritten text-xl text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors placeholder-[#a1887f] resize-none"
-              />
-            </div>
-
-            {/* Honeypot поле (скрытое) для защиты от спама */}
-            <div style={{ display: 'none' }}>
-              <label>
-                Не заполняй это поле:
-                <input type="text" name="_gotcha" />
-              </label>
-            </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isSubmitting || !formData.message.trim()}
-                className={`w-full py-4 font-headers text-2xl font-bold tracking-wider border-2 rounded transition-all duration-300 transform ${
-                  isSubmitting || !formData.message.trim()
-                    ? 'bg-[#8d6e63] text-[#d7ccc8] cursor-not-allowed opacity-70' 
-                    : 'bg-[#5d4037] text-[#f3e5ab] hover:bg-[#8d6e63] hover:text-[#fff8e1] border-[#3e2723] hover:scale-[1.02]'
-                }`}
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center">
-                    <span className="animate-spin mr-3">⚔️</span>
-                    Отправляем сову на Formspree...
-                  </span>
-                ) : (
-                  '✉️ Отправить послание'
-                )}
-              </button>
+              )}
               
-              <div className="mt-4 p-3 bg-[#fff8e1] rounded border border-[#d7ccc8] text-center">
-                <p className="font-handwritten text-lg text-[#8d6e63]">
+              <div className="space-y-2">
+                <label className="block font-headers text-xl text-[#5d4037]">
+                  <span className="border-b-2 border-[#8d6e63] pb-1">Твоё имя</span>
+                  <span className="text-lg text-[#8d6e63] ml-2">(необязательно)</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Геральт, Цири, Йеннифер..."
+                  className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-handwritten text-xl text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors placeholder-[#a1887f]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-headers text-xl text-[#5d4037]">
+                  <span className="border-b-2 border-[#8d6e63] pb-1">Email для ответа</span>
+                  <span className="text-lg text-[#8d6e63] ml-2">(необязательно)</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="example@email.com"
+                  className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-handwritten text-xl text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors placeholder-[#a1887f]"
+                />
+                <p className="text-sm text-[#8d6e63] italic">
+                  Если хочешь получить ответ, укажи настоящий email
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-headers text-xl text-[#5d4037]">
+                  <span className="border-b-2 border-[#8d6e63] pb-1">Тип послания</span>
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-headers text-lg text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors appearance-none cursor-pointer"
+                >
+                  <option value="bug">📜 Нашёл баг/ошибку</option>
+                  <option value="suggestion">💡 Есть идея для улучшения</option>
+                  <option value="creature">🐺 Хочу новое существо в бестиарий</option>
+                  <option value="other">⚔️ Прочее</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block font-headers text-xl text-[#5d4037]">
+                  <span className="border-b-2 border-[#8d6e63] pb-1">Текст послания *</span>
+                </label>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  rows={5}
+                  placeholder="Что у тебя на душе, странник?..."
+                  className="w-full px-4 py-3 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded font-handwritten text-xl text-[#3e2723] focus:border-[#8d6e63] focus:outline-none transition-colors placeholder-[#a1887f] resize-none"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !formData.message.trim()}
+                  className={`flex-1 py-4 font-headers text-2xl font-bold tracking-wider border-2 rounded transition-all duration-300 ${
+                    isSubmitting || !formData.message.trim()
+                      ? 'bg-[#8d6e63] text-[#d7ccc8] cursor-not-allowed opacity-70' 
+                      : 'bg-[#5d4037] text-[#f3e5ab] hover:bg-[#8d6e63] hover:text-[#fff8e1] border-[#3e2723] hover:scale-[1.02]'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center">
+                      <span className="animate-spin mr-3">⚔️</span>
+                      Отправка...
+                    </span>
+                  ) : (
+                    'Отправить через Formspree'
+                  )}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={handleTestEmail}
+                  className="py-4 px-6 font-headers text-xl bg-[#8d6e63] text-[#f3e5ab] border-2 border-[#5d4037] rounded hover:bg-[#a1887f] transition-colors"
+                >
+                  Тест данных
+                </button>
+              </div>
+              
+              <div className="mt-4 p-3 bg-[#fff8e1] rounded border border-[#d7ccc8]">
+                <p className="text-center font-handwritten text-lg text-[#8d6e63]">
                   <span className="font-bold">Formspree ID:</span> mvgebapo
                 </p>
-                <p className="text-sm font-serif text-[#8d6e63] mt-1">
-                  Отправляется через Formspree API. Страница не перезагружается.
+                <p className="text-center text-sm text-[#8d6e63] mt-1">
+                  Открой консоль браузера (F12) для отладки
                 </p>
               </div>
-            </div>
-          </form>
-        )}
+            </form>
 
-        <div className="mt-10 pt-6 border-t-2 border-dashed border-[#d7ccc8]">
-          <h3 className="font-headers text-2xl text-[#5d4037] mb-4 text-center">Как работает отправка?</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-[#fff8e1] rounded border border-[#d7ccc8] text-center">
-              <div className="text-3xl mb-2">1️⃣</div>
-              <h4 className="font-headers text-lg text-[#8a0a0a] mb-2">Заполняешь форму</h4>
-              <p className="font-handwritten text-[#5d4037]">Пишешь сообщение на этой странице</p>
-            </div>
-            <div className="p-4 bg-[#fff8e1] rounded border border-[#d7ccc8] text-center">
-              <div className="text-3xl mb-2">2️⃣</div>
-              <h4 className="font-headers text-lg text-[#8a0a0a] mb-2">AJAX отправка</h4>
-              <p className="font-handwritten text-[#5d4037]">JavaScript отправляет данные на Formspree</p>
-            </div>
-            <div className="p-4 bg-[#fff8e1] rounded border border-[#d7ccc8] text-center">
-              <div className="text-3xl mb-2">3️⃣</div>
-              <h4 className="font-headers text-lg text-[#8a0a0a] mb-2">Уведомление здесь</h4>
-              <p className="font-handwritten text-[#5d4037]">Видишь подтверждение на этой же странице</p>
-            </div>
-          </div>
-          
-          <div className="mt-6 text-center">
-            <a 
-              href="https://formspree.io" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#5d4037] text-[#f3e5ab] font-headers rounded hover:bg-[#8d6e63] transition-colors"
-            >
-              <span>Powered by Formspree</span>
-              <span>⚡</span>
-            </a>
-            <p className="mt-2 text-sm font-serif text-[#8d6e63]">
-              Form ID: <code className="bg-[#fff8e1] px-2 py-1 rounded">mvgebapo</code>
-            </p>
-          </div>
-        </div>
+            {/* Убрали нижнюю часть "Как работает отправка?" */}
+          </>
+        )}
       </div>
     </div>
   );
