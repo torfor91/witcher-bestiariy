@@ -14,7 +14,7 @@ export const GeraltInfo: React.FC = () => {
           <div className="md:w-1/3 flex flex-col items-center">
             <div className="w-full aspect-[3/4] bg-[#2a2320] border-8 border-[#3e2723] shadow-2xl relative mb-6 group overflow-hidden">
                <img 
-                 src="https://upload.wikimedia.org/wikipedia/en/c/c9/Geralt_of_Rivia_Witcher_3_Wild_Hunt_Version.png" 
+                 src="/images/kartinka.png" 
                  alt="Geralt of Rivia" 
                  className="w-full h-full object-cover sepia-[0.3] contrast-125 group-hover:scale-105 transition-transform duration-700"
                />
