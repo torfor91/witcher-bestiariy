@@ -26,5 +26,6 @@ export enum ViewState {
   LEGENDS = 'LEGENDS',
   CONTRACTS = 'CONTRACTS',
   CREATURE_DETAIL = 'CREATURE_DETAIL',
-  GERALT = 'GERALT'
+  GERALT = 'GERALT',
+  FEEDBACK = 'FEEDBACK' // Добавляем новую вкладку
 }

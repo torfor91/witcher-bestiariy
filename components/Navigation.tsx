@@ -12,6 +12,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentView, onNavigate 
     { label: 'Легенды', value: ViewState.LEGENDS },
     { label: 'Доска Заказов', value: ViewState.CONTRACTS },
     { label: 'О Ведьмаке', value: ViewState.GERALT },
+    { label: 'Обратная связь', value: ViewState.FEEDBACK }, // Новая кнопка
   ];
 
   return (

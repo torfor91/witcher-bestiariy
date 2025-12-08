@@ -5,6 +5,7 @@ import { Legends } from './components/Legends';
 import { ContractsBoard } from './components/ContractsBoard';
 import { CreatureDetail } from './components/CreatureDetail';
 import { GeraltInfo } from './components/GeraltInfo';
+import { Feedback } from './components/Feedback';
 import { ViewState, Creature } from './types';
 
 const App: React.FC = () => {
@@ -38,6 +39,8 @@ const App: React.FC = () => {
         return <ContractsBoard />;
       case ViewState.GERALT:
         return <GeraltInfo />;
+      case ViewState.FEEDBACK:
+        return <Feedback />;
       case ViewState.CREATURE_DETAIL:
         return selectedCreature ? (
           <CreatureDetail creature={selectedCreature} onBack={handleBackToBestiary} />

@@ -54,7 +54,7 @@ export const Bestiary: React.FC<BestiaryProps> = ({ onSelectCreature }) => {
             <div className="flex items-center space-x-1 mb-3 bg-[rgba(0,0,0,0.05)] p-1 rounded">
                <span className="text-xl font-handwritten font-bold text-[#3e2723] mr-2">Опасность:</span>
                {[...Array(5)].map((_, i) => (
-                 <span key={i} className={`text-lg drop-shadow-sm ${i < creature.threatLevel ? 'text-[#bf360c]' : 'text-[#d7ccc8]'}`}>
+                 <span key={i} className={`text-lg drop-shadow-sm ${i < creature.threatLevel ? 'opacity-100 grayscale-0' : 'opacity-20 grayscale'}`}>
                    💀
                  </span>
                ))}
@@ -72,4 +72,4 @@ export const Bestiary: React.FC<BestiaryProps> = ({ onSelectCreature }) => {
       </div>
     </div>
   );
-};
+};  
