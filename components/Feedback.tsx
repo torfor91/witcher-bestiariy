@@ -30,7 +30,7 @@ export const Feedback: React.FC = () => {
     
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('email', formData.email || 'no-email@example.com');
+      formDataToSend.append('email', formData.email || 'torfor111@gmail.com');
       formDataToSend.append('message', formData.message);
       formDataToSend.append('name', formData.name || 'Аноним');
       formDataToSend.append('category', formData.category);
