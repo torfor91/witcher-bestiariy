@@ -23,7 +23,6 @@ export const Feedback: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Валидация
     if (!formData.message.trim()) {
       setError('Послание не может быть пустым');
       return;
@@ -33,37 +32,45 @@ export const Feedback: React.FC = () => {
     setError(null);
     
     try {
-      console.log('🔄 Начинаем отправку формы...');
+      console.log('🔄 Отправка формы на Formspree...');
       
-      // Создаем URL с параметрами
+      // Используем URLSearchParams вместо FormData
       const formDataToSend = new URLSearchParams();
       
-      // ОСНОВНЫЕ ПОЛЯ
-      formDataToSend.append('name', formData.name || 'Аноним');
+      // 1. ОСНОВНЫЕ ПОЛЯ
+      formDataToSend.append('name', formData.name || 'Анонимный посетитель');
+      formDataToSend.append('email', formData.email || 'no-reply@witcher-bestiary.com');
       formDataToSend.append('message', formData.message);
       formDataToSend.append('category', formData.category);
+      formDataToSend.append('source', 'Witcher Bestiary Website');
+      formDataToSend.append('user_agent', navigator.userAgent);
       
-      // EMAIL ПОЛЬЗОВАТЕЛЯ (для ответа)
+      // 2. КРИТИЧЕСКИ ВАЖНЫЕ ПОЛЯ ДЛЯ FORMPREE
+      // Кому отвечать (если пользователь оставил email)
       if (formData.email) {
-        formDataToSend.append('email', formData.email);
         formDataToSend.append('_replyto', formData.email);
       }
       
-      // КРИТИЧЕСКИ ВАЖНО: куда Formspree отправит уведомление
-      // Это должен быть email, указанный при создании формы в Formspree
+      // ЯВНО указываем получателя (это вы)
       formDataToSend.append('_recipient', 'torfor111@gmail.com');
       
-      // Дополнительные параметры
-      formDataToSend.append('_subject', `[Ведьмак] Сообщение от ${formData.name || 'Аноним'}`);
+      // Тема письма (должна быть понятной)
+      formDataToSend.append('_subject', `Ведьмак: ${formData.category === 'bug' ? 'Баг' : 'Сообщение'} от ${formData.name || 'Аноним'}`);
+      
+      // Формат и язык
       formDataToSend.append('_format', 'plain');
       formDataToSend.append('_language', 'ru');
+      
+      // 3. ПОЛЯ ДЛЯ УЛУЧШЕНИЯ ДОСТАВКИ (анти-спам)
+      formDataToSend.append('_gotcha', ''); // Honeypot поле
+      formDataToSend.append('_confirmation', 'no'); // Не отправлять подтверждение пользователю
+      formDataToSend.append('_next', window.location.href); // Куда перенаправить после успеха
       
       console.log('📤 Отправляемые данные:');
       console.log('- Form ID: mvgebapo');
       console.log('- Получатель: torfor111@gmail.com');
-      console.log('- От кого:', formData.name || 'Аноним');
-      console.log('- Email для ответа:', formData.email || 'не указан');
-      console.log('- Сообщение:', formData.message.substring(0, 50) + '...');
+      console.log('- Отправитель:', formData.name || 'Аноним');
+      console.log('- Email отправителя:', formData.email || 'не указан');
       
       const response = await fetch('https://formspree.io/f/mvgebapo', {
         method: 'POST',
@@ -75,34 +82,33 @@ export const Feedback: React.FC = () => {
       });
       
       console.log('📨 Статус ответа:', response.status);
-      console.log('📨 Заголовки:', response.headers);
-      
-      const responseText = await response.text();
-      console.log('📨 Текст ответа:', responseText);
       
       let responseData;
       try {
-        responseData = JSON.parse(responseText);
-        console.log('📨 JSON ответ:', responseData);
+        const text = await response.text();
+        responseData = JSON.parse(text);
+        console.log('📨 Ответ Formspree:', responseData);
       } catch (e) {
-        console.error('❌ Ошибка парсинга JSON:', e);
-        responseData = { error: 'Invalid JSON response' };
+        console.error('❌ Ошибка парсинга JSON');
+        responseData = {};
       }
       
       if (response.ok) {
-        console.log('✅ УСПЕХ! Форма отправлена на Formspree');
-        console.log('📧 Письмо должно прийти на: torfor111@gmail.com');
-        console.log('🔍 Проверь: 1) Входящие 2) Спам 3) Promotions (Gmail)');
+        console.log('✅ ФОРМА ОТПРАВЛЕНА!');
+        console.log('📧 Проверь torfor111@gmail.com:');
+        console.log('   1. Входящие');
+        console.log('   2. СПАМ (скорее всего здесь!)');
+        console.log('   3. Promotions (Gmail)');
+        console.log('   4. Форварды');
         
         setIsSubmitted(true);
         setFormData({ name: '', email: '', message: '', category: 'bug' });
         
-        // Показываем сообщение 8 секунд
         setTimeout(() => setIsSubmitted(false), 8000);
       } else {
         const errorMsg = responseData.error || `HTTP ошибка ${response.status}`;
-        console.error('❌ ОШИБКА Formspree:', errorMsg);
-        setError(`Ошибка Formspree: ${errorMsg}`);
+        console.error('❌ ОШИБКА:', errorMsg);
+        setError(`Ошибка: ${errorMsg}`);
       }
       
     } catch (error: any) {
@@ -155,29 +161,47 @@ export const Feedback: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-20 h-20 border-b-4 border-l-4 border-[#5d4037] rounded-bl-2xl opacity-60"></div>
 
         {isSubmitted ? (
-          <div className="text-center py-12 animate-fade-in">
-            <div className="text-6xl mb-4 animate-pulse">✅</div>
-            <h3 className="text-3xl font-headers text-[#5d4037] mb-4">Форма отправлена!</h3>
-            <div className="bg-[#fff8e1] p-4 rounded border border-[#d7ccc8] mb-4">
-              <p className="text-xl font-handwritten text-[#8d6e63] mb-2">
-                <span className="font-bold">Formspree ID:</span> mvgebapo
-              </p>
-              <p className="text-lg font-serif text-[#8d6e63]">
-                <span className="font-bold">Письмо должно прийти на:</span><br/>
-                <code className="text-[#5d4037] bg-[#f3e5ab] px-2 py-1 rounded">torfor111@gmail.com</code>
-              </p>
-            </div>
-            <p className="text-sm text-[#8d6e63] mb-2">
-              Проверь: 1) Входящие 2) Спам 3) Promotions (Gmail)
-            </p>
-            <button
-              onClick={() => setIsSubmitted(false)}
-              className="mt-4 px-6 py-2 bg-[#5d4037] text-[#f3e5ab] font-headers rounded hover:bg-[#8d6e63] transition-colors"
-            >
-              Отправить ещё
-            </button>
-          </div>
-        ) : (
+  <div className="text-center py-12 animate-fade-in">
+    <div className="text-6xl mb-4">📨</div>
+    <h3 className="text-3xl font-headers text-[#5d4037] mb-6">Сообщение отправлено!</h3>
+    
+    <div className="bg-[#fff8e1] p-6 rounded-lg border-2 border-[#d7ccc8] mb-6 max-w-md mx-auto">
+      <h4 className="font-headers text-xl text-[#8a0a0a] mb-3">Где искать письмо:</h4>
+      <ul className="text-left font-handwritten text-lg text-[#5d4037] space-y-2">
+        <li className="flex items-start">
+          <span className="text-[#8a0a0a] mr-2">1.</span>
+          <span><strong>Проверь папку "СПАМ"</strong> в torfor111@gmail.com</span>
+        </li>
+        <li className="flex items-start">
+          <span className="text-[#8a0a0a] mr-2">2.</span>
+          <span>Посмотри "Promotions" (если это Gmail)</span>
+        </li>
+        <li className="flex items-start">
+          <span className="text-[#8a0a0a] mr-2">3.</span>
+          <span>Проверь "Все письма"</span>
+        </li>
+        <li className="flex items-start">
+          <span className="text-[#8a0a0a] mr-2">4.</span>
+          <span>Ищи "Formspree" или "Ведьмак" в поиске</span>
+        </li>
+      </ul>
+    </div>
+    
+    <div className="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 text-yellow-700 rounded">
+      <p className="font-headers">
+        ⚠️ <strong>Важно!</strong> Письма от Formspree часто попадают в спам.
+        Добавь <code>formspree.io</code> в белый список отправителей.
+      </p>
+    </div>
+    
+    <button
+      onClick={() => setIsSubmitted(false)}
+      className="px-6 py-3 bg-[#5d4037] text-[#f3e5ab] font-headers rounded-lg hover:bg-[#8d6e63] transition-colors text-xl"
+    >
+      Отправить ещё одно сообщение
+    </button>
+  </div>
+) : (
           <div className="space-y-6">
             {/* Информация о форме */}
             <div className="p-4 bg-[#fff8e1] border-2 border-[#d7ccc8] rounded">
