@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Быстрый тест API</title>
+</head>
+<body>
+    <h1>Тест DeepSeek API</h1>
+    <button onclick="testAPI()">Тестировать</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Тестирование...';
+            
+            // Пробуем разные ключи (примеры)
+            const testKeys = [
+                'sk-fb9e87074d1148e4a84a7f06b6cf1170',
+                'test-key',
+                ''
+            ];
+            
+            for (const key of testKeys) {
+                try {
+                    const response = await fetch('https://api.deepseek.com/models', {
+                        headers: {
+                            'Authorization': `Bearer ${key}`
+                        }
+                    });
+                    
+                    resultDiv.innerHTML += `<br>Ключ "${key.substring(0, 10)}...": ${response.status}`;
+                } catch (error) {
+                    resultDiv.innerHTML += `<br>Ключ "${key.substring(0, 10)}...": Ошибка ${error.message}`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

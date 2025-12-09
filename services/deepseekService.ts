@@ -2,6 +2,9 @@ import { ChatMessage } from '../types';
 
 // Конфигурация DeepSeek API
 const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || '';
+
+// ✅ РАБОЧИЙ CORS прокси
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
 
 // Тип для чат-сессии
@@ -119,8 +122,8 @@ export const sendMessageToGeralt = async (
   creatureInfo?: { name: string; className: string; weaknesses: string[]; description: string }
 ): Promise<string> => {
   // Проверка API ключа
-  if (!DEEPSEEK_API_KEY || DEEPSEEK_API_KEY === 'ваш_ключ_здесь') {
-    console.error('❌ DeepSeek API ключ не настроен!');
+  if (!DEEPSEEK_API_KEY || DEEPSEEK_API_KEY.length < 20) {
+    console.error('❌ API ключ не настроен или слишком короткий!');
     return getFallbackResponse(userMessage, context, creatureInfo?.name);
   }
   
@@ -134,53 +137,33 @@ export const sendMessageToGeralt = async (
       content: userMessage
     });
     
-    console.log(`📤 Отправка к DeepSeek (${context}):`, {
-      keyLength: DEEPSEEK_API_KEY.length,
-      messages: session.messages.length,
-      lastMessage: userMessage.substring(0, 50) + '...'
-    });
+    console.log(`📤 Отправка к DeepSeek через CORS прокси (${context})`);
     
-    // Отправляем запрос к DeepSeek
-    const response = await fetch(DEEPSEEK_API_URL, {
+    // ✅ ИСПРАВЛЕННЫЙ ЗАПРОС: Правильный URL через CORS прокси
+    const targetUrl = CORS_PROXY + encodeURIComponent(DEEPSEEK_API_URL);
+    
+    const response = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'deepseek-chat', // Основная модель
-        // model: 'deepseek-reasoner', // Для более сложных рассуждений (платно)
-        messages: session.messages.slice(-8), // Берем последние 8 сообщений
+        model: 'deepseek-chat',
+        messages: session.messages.slice(-8),
         temperature: 0.85,
         max_tokens: 600,
-        stream: false,
-        frequency_penalty: 0.1,
-        presence_penalty: 0.1
+        stream: false
       })
     });
     
     console.log('📨 Статус:', response.status);
     
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      console.error('❌ Ошибка API:', response.status, errorData);
-      
-      // Удаляем последнее сообщение пользователя (оно не было обработано)
+      const errorText = await response.text();
+      console.error('❌ Ошибка API:', response.status, errorText);
       session.messages.pop();
-      
-      // Обработка ошибок
-      if (response.status === 401) {
-        return "Проклятье! Неверный ключ от портала. Проверь настройки API.";
-      }
-      if (response.status === 429) {
-        return "Хм... Лимит историй на сегодня исчерпан. Приходи завтра.";
-      }
-      if (response.status === 400) {
-        return "Что-то не так с твоим вопросом. Спроси по-другому.";
-      }
-      
-      return "Медальон дрожит... Магия глушит связь. Попробуй позже.";
+      return getFallbackResponse(userMessage, context, creatureInfo?.name);
     }
     
     const data = await response.json();
