@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChatMessage } from '../types';
-import { createChatSession, sendMessageToGeralt } from '../services/geminiService';
-import { SYSTEM_PROMPT_GERALT_BOARD } from '../constants';
+import { sendMessageToGeralt, SYSTEM_PROMPT_GERALT_BOARD } from '../services/deepseekService';
 
 export const ContractsBoard: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatSessionRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    chatSessionRef.current = createChatSession(SYSTEM_PROMPT_GERALT_BOARD);
+    // Начальное сообщение
     setMessages([{
       id: 'init',
       role: 'model',
-      text: "Подходи, не бойся. Читай, что написано. Ищешь работы или хочешь, чтобы я кого-то убил? Пиши свое объявление."
+      text: "Подходи, не бойся. Читай, что написано. Ищешь работы или хочешь, чтобы я кого-то убил? Пиши своё объявление."
     }]);
   }, []);
 
@@ -28,22 +26,45 @@ export const ContractsBoard: React.FC = () => {
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text: input };
+    const userMsg: ChatMessage = { 
+      id: Date.now().toString(), 
+      role: 'user', 
+      text: input 
+    };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const responseText = await sendMessageToGeralt(chatSessionRef.current, input);
-      const modelMsg: ChatMessage = { id: (Date.now() + 1).toString(), role: 'model', text: responseText };
+      // Используем фиксированный ID для доски заказов
+      const responseText = await sendMessageToGeralt(
+        'contracts-board',
+        input,
+        'board'
+      );
+      
+      const modelMsg: ChatMessage = { 
+        id: (Date.now() + 1).toString(), 
+        role: 'model', 
+        text: responseText 
+      };
       setMessages(prev => [...prev, modelMsg]);
     } catch (e) {
       console.error(e);
+      const errorMsg: ChatMessage = {
+        id: 'error',
+        role: 'model',
+        text: "Черт... Доска сегодня не работает. Попробуй позже."
+      };
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Остальной код компонента остается БЕЗ ИЗМЕНЕНИЙ...
+  // (от заголовка до конца)
+  
   return (
     <div className="w-full max-w-6xl mx-auto p-2 md:p-6 animate-fade-in">
       <h2 className="text-5xl md:text-6xl font-handwritten font-bold text-[#f3e5ab] text-center mb-6 drop-shadow-[0_4px_4px_rgba(0,0,0,0.9)]">

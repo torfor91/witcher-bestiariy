@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Creature, ChatMessage } from '../types';
-import { createChatSession, sendMessageToGeralt } from '../services/geminiService';
-import { SYSTEM_PROMPT_GERALT_NOTES } from '../constants';
+import { sendMessageToGeralt, SYSTEM_PROMPT_GERALT_NOTES } from '../services/deepseekService';
 
 interface CreatureDetailProps {
   creature: Creature;
@@ -12,15 +11,10 @@ export const CreatureDetail: React.FC<CreatureDetailProps> = ({ creature, onBack
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatSessionRef = useRef<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Initialize chat specifically for this creature
-    const systemPrompt = `${SYSTEM_PROMPT_GERALT_NOTES}\n\nТекущая запись, которую вы обсуждаете: ${creature.name}. Класс: ${creature.className}. Слабости: ${creature.weaknesses.join(', ')}. Описание из книги: ${creature.description}`;
-    chatSessionRef.current = createChatSession(systemPrompt);
-    
-    // Initial message from Geralt
+    // Начальное сообщение при загрузке
     setMessages([{
       id: 'init',
       role: 'model',
@@ -29,6 +23,7 @@ export const CreatureDetail: React.FC<CreatureDetailProps> = ({ creature, onBack
   }, [creature]);
 
   useEffect(() => {
+    // Скролл к последнему сообщению
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
@@ -37,22 +32,51 @@ export const CreatureDetail: React.FC<CreatureDetailProps> = ({ creature, onBack
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMsg: ChatMessage = { id: Date.now().toString(), role: 'user', text: input };
+    const userMsg: ChatMessage = { 
+      id: Date.now().toString(), 
+      role: 'user', 
+      text: input 
+    };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
 
     try {
-      const responseText = await sendMessageToGeralt(chatSessionRef.current, input);
-      const modelMsg: ChatMessage = { id: (Date.now() + 1).toString(), role: 'model', text: responseText };
+      // Отправляем сообщение через DeepSeek
+      const responseText = await sendMessageToGeralt(
+        creature.id, // ID существа как идентификатор сессии
+        input,
+        'notes',
+        {
+          name: creature.name,
+          className: creature.className,
+          weaknesses: creature.weaknesses,
+          description: creature.description
+        }
+      );
+      
+      const modelMsg: ChatMessage = { 
+        id: (Date.now() + 1).toString(), 
+        role: 'model', 
+        text: responseText 
+      };
       setMessages(prev => [...prev, modelMsg]);
     } catch (e) {
-      console.error(e);
+      console.error('Ошибка отправки:', e);
+      const errorMsg: ChatMessage = {
+        id: 'error',
+        role: 'model',
+        text: "Проклятье! Что-то пошло не так. Попробуй ещё раз."
+      };
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Остальной код компонента остается БЕЗ ИЗМЕНЕНИЙ...
+  // (от button onBack до конца компонента)
+  
   return (
     <div className="p-2 md:p-8 max-w-7xl mx-auto animate-fade-in">
       <button 
