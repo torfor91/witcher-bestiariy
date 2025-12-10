@@ -61,6 +61,7 @@ witcher-bestiariy/
 │   └── main.jsx       # Точка входа
 ├── index.html         # HTML шаблон
 └── package.json       # Зависимости и скрипты
+text```
 ✨ Особенности
 📱 Адаптивный дизайн
 
