@@ -62,8 +62,8 @@ npm run preview
 # или
 yarn preview
 
-<!-- br tag for spacing -->
 <br>
+<!-- br tag for spacing -->
 Структура проекта
 witcher-bestiariy/
 ├── public/              # Статические файлы
@@ -75,8 +75,8 @@ witcher-bestiariy/
 │   └── main.jsx       # Точка входа
 ├── index.html         # HTML шаблон
 └── package.json       # Зависимости и скрипты
-<br>
 <!-- br tag for spacing -->
+<br>
 
 ✨ Особенности
 📱 Адаптивный дизайн
