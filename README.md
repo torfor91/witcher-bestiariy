@@ -35,7 +35,6 @@
 - Node.js 16+<!-- br --><br>
 - npm или yarn
 
-<!-- br tag for spacing -->
 <br>
 
 ### Установка
